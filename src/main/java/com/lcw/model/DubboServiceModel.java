@@ -31,6 +31,10 @@ public class DubboServiceModel {
     private String application = "";
     private String interfaceName;
     private String interfaceFullName;
+    /**
+     * key为provider url的ip:port部分;
+     * value为url中的method分割后的数组
+     */
     private final HashMap<String, String[]> methods = new HashMap<>();
     private final HashMap<String, String> urlMap = new HashMap<>();
     private final HashMap<String, List<MethodModel>> fullMethods = new HashMap<>();

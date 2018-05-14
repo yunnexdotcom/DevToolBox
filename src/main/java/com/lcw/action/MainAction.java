@@ -736,7 +736,7 @@ public class MainAction {
                     ApplicationStageManager.getApplication().getHostServices().showDocument(loc);
                 });
             }
-            mc.adWeb.getEngine().load(AD_URL);
+//            mc.adWeb.getEngine().load(AD_URL);
         });
         mc.providerIP.setOnAction((e) -> {
             String ip = (String) mc.providerIP.getSelectionModel().getSelectedItem();
@@ -751,7 +751,7 @@ public class MainAction {
                 }
             }
         });
-        mc.adWeb.getEngine().load(AD_URL);
+//        mc.adWeb.getEngine().load(AD_URL);
         mc.tabPane.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> o, Number ov, Number nv) -> {
             if (nv.intValue() != 0) {
                 statusText = statusText.isEmpty() ? mc.listViewStatusLabel.getText() : statusText;
@@ -823,11 +823,11 @@ public class MainAction {
                 return new Label();
             }
         });
-        new Thread(() -> {
-            Platform.runLater(() -> {
-                checkUpdateAction();
-            });
-        }).start();
+//        new Thread(() -> {
+//            Platform.runLater(() -> {
+//                checkUpdateAction();
+//            });
+//        }).start();
     }
 
     private TableColumn getColumn(String name, String key) {

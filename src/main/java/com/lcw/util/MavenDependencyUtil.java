@@ -131,6 +131,13 @@ public class MavenDependencyUtil {
         return urls;
     }
 
+    /**
+     * 递归找出一个目录下所有jar包
+     * @param f
+     * @param urls
+     * @param deep
+     * @throws MalformedURLException
+     */
     private static void getSubFile(File f, ArrayList<URL> urls, int deep) throws MalformedURLException {
         for (File file : f.listFiles()) {
             if (file.isDirectory() && deep < 30) {

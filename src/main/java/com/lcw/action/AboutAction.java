@@ -30,9 +30,9 @@ public class AboutAction {
                     ApplicationStageManager.getApplication().getHostServices().showDocument(loc);
                 });
             }
-            ac.adWeb.getEngine().load(AD_URL);
+//            ac.adWeb.getEngine().load(AD_URL);
         });
-        ac.adWeb.getEngine().load(AD_URL);
+//        ac.adWeb.getEngine().load(AD_URL);
     }
 
     public void openWebAction() {
