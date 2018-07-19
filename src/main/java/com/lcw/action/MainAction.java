@@ -47,6 +47,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -139,13 +140,15 @@ public class MainAction {
                     List<String> services = ZookeeperUtil.getDubboService(null);
                     List<DubboServiceModel> dsms = new ArrayList<>();
                     if (services != null) {
+                        String filter = mc.serviceFilter.getText();
                         for (String service : services) {
-                            List<String> subList = ZookeeperUtil.getDubboService(service);
-                            DubboServiceModel ds = new DubboServiceModel(service);
-                            for (String s : subList) {
-                                ds.init(s, mc.timeout.getText());
+                            if (StringUtils.isNotBlank(filter)) {
+                                if (service.toLowerCase().contains(filter.toLowerCase())) {
+                                    initService(service, dsms);
+                                }
+                            } else {
+                                initService(service, dsms);
                             }
-                            dsms.add(ds);
                         }
                     }
                     Platform.runLater(() -> {
@@ -177,6 +180,15 @@ public class MainAction {
             LOGGER.error(ex.getLocalizedMessage(), ex);
             DialogUtil.close();
         }
+    }
+
+    private void initService(String service, Collection<DubboServiceModel> dsms) {
+        List<String> subList = ZookeeperUtil.getDubboService(service);
+        DubboServiceModel ds = new DubboServiceModel(service);
+        for (String s : subList) {
+            ds.init(s, mc.timeout.getText());
+        }
+        dsms.add(ds);
     }
 
     public void serviceFilterKeyUpAction() {
@@ -248,7 +260,25 @@ public class MainAction {
                         Method md = mm.getInterfacMethod();
                         String to = mc.timeout.getText();
                         String ip = (String) mc.providerIP.getSelectionModel().getSelectedItem();
-                        Object o = DubboUtil.invoke(loader.loadClass(item.getInterfaceFullName()), md, item.getUrl(to, ip), com.alibaba.fastjson.JSON.parseArray(json, md.getParameterTypes()).toArray());
+                        List<Object> ja = com.alibaba.fastjson.JSON.parseArray(json, md.getParameterTypes());
+                        List<Object> param = new ArrayList<>();
+                        for (int i = 0; i < ja.size(); i++) {
+                            Object o = ja.get(i);
+                            if (o instanceof List) {
+                                ParameterModel pm = mm.getParameters().get(i);
+                                String tn = pm.getParameterizedType().getActualTypeArguments()[0].getTypeName();
+                                com.alibaba.fastjson.JSONArray o1 = (com.alibaba.fastjson.JSONArray) com.alibaba.fastjson.JSON.parseArray(json).get(i);
+                                List<Object> ls = new ArrayList<>();
+                                for (Object obj : o1) {
+                                    com.alibaba.fastjson.JSONObject jobj = (com.alibaba.fastjson.JSONObject) obj;
+                                    ls.add(com.alibaba.fastjson.JSON.parseObject(jobj.toJSONString(), Class.forName(tn)));
+                                }
+                                param.add(ls);
+                            } else {
+                                param.add(o);
+                            }
+                        }
+                        Object o = DubboUtil.invoke(loader.loadClass(item.getInterfaceFullName()), md, item.getUrl(to, ip), param.toArray());
                         Platform.runLater(() -> {
                             mc.responseArea.setText(o != null ? Formatter.formatDubboParam(o.toString()) : "");
                             DialogUtil.close();
